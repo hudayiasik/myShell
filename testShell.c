@@ -62,7 +62,6 @@ void processString(char *str, char **parsed){
 	}
 }
 
-
 int main(){
 	char inputString[1000], *Args[100];
 	while (1) {

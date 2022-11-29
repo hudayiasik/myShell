@@ -59,6 +59,25 @@ void Clear(){
 void Echo(char *str){
 	printf("\nEcho : %s", str);
 }
+void bash(){
+	//Child process
+	pid_t pid = fork();
+
+	if (pid == -1) {
+		printf("\nFailed to fork");
+		return;
+	} else if (pid == 0) {
+		if (execvp("bash", NULL) < 0) {
+			printf("\nInvalid command..");
+		}
+		exit(0);
+	} else {
+		// waiting for child to abort
+		wait(NULL);
+		return;
+	}
+
+}
 // Help command
 void Help()
 {
@@ -89,10 +108,8 @@ int executeCommands(char **parsed){
 	ListOfCommands[6] = "cat";	  //--------------
 	ListOfCommands[7] = "writef"; //-------------
 
-	for (i = 0; i < NumberOfCommands; i++)
-	{
-		if (strcmp(parsed[0], ListOfCommands[i]) == 0)
-		{
+	for (i = 0; i < NumberOfCommands; i++){
+		if (strcmp(parsed[0], ListOfCommands[i]) == 0){
 			indicator = i + 1;
 			break;
 		}

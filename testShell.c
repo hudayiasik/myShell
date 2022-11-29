@@ -4,7 +4,9 @@
 #include<unistd.h>
 #include<sys/types.h>
 #include<sys/wait.h>
+#include <dirent.h> 
 
+int i; 
 char *readLine(){
 	char *line = (char *)malloc(sizeof(char) * 1024); //  Buffer Allocation 
 	char line[50]={};
@@ -13,7 +15,6 @@ char *readLine(){
 	char nullChar = '\0';
 	int bufferSize = 1024;
 	char newLine = '\n';
-
 	if (!line){ // Fail
 		printf("\n Buffer Could Not Allocated.");
 		exit(1); 
@@ -25,9 +26,9 @@ char *readLine(){
 			line[pos] = nullChar;
 			return line;
 		}
-		else{
+		else
 			line[pos] = read;
-		}
+		
 		pos ++;
 		// If the buffer exceeded 
 		if (pos >= bufferSize){
@@ -45,90 +46,107 @@ char *readLine(){
 int takeInput(char* str){
 	char* buf;
 	buf = readLine();
-	if (strlen(buf) != 0) {
+	if (strlen(buf)!= 0){
 		strcpy(str, buf);
 		return 0;
-	} else return 1;
+	}else 
+		return 1;
 }
 
 void processString(char *str, char **parsed){
-	int i;
-	for (i = 0; i < 100; i++)
-	{
+	for (i=0; i < 100; i++){
 		parsed[i] = strsep(&str, " ");
-		if (parsed[i] == NULL)
-			break;
-		if (strlen(parsed[i]) == 0)
-			i--;
+		if (parsed[i] == NULL)break;
+		if (strlen(parsed[i]) == 0)i--;
 	}
 }
+//_______________	COMMANDS________________________
+
+void clear(){
+	printf("\033[H\033[J");
+}
+void cat(char *str){
+	printf("cat: %s\n",str);
+}
+// Help command
+void help(){
+	puts("\nCommand list ..."
+		 "\n>exit -- exits program "
+		 "\n>ls -- lists files"
+		 "\n>exit -- exists from current program"
+		 "\n>clear -- Clear Screen"
+		 "\n>cat -- Custom program to repeat a string"
+		 "\n>bash -- Opens actual bash terminal");
+
+	return;
+}
+void bash(){
+	pid_t pid = fork();
+	if (pid == -1) {
+		printf("\nFailed to fork");
+		return;
+	} else if (pid == 0) {
+		if (execvp("bash", NULL) < 0) {
+			printf("Invalid command..\n");
+		}
+		exit(0);
+	} else {
+		// wait for the child  abort
+		wait(NULL);
+		return;
+	}
+
+}
+void ls(){
+  DIR *d;
+  struct dirent *dir;
+  d = opendir(".");
+  if (d) {
+    while ((dir = readdir(d)) != NULL) {
+      printf("%s\n", dir->d_name);
+    }
+    closedir(d);
+  }
+  return(0);
+}
+
+//__________________________________________________
+
+
 
 int executeCommands(char **parsed){
-	int NumberOfCommands = 8;
-	int i;
-	int indicator = 0;
-	char *ListOfCommands[NumberOfCommands];
+	int commandCount = 8;
+	int indicator = 0;	   //0      1       2       3    4     5       6      7
+	char* commandList[]= {"exit","bash","clear","ls","cat","execx","writef","help"};
+	
+	for (i = 0; i < sizeof(commandList);i++){
+		if(strcmp(parsed[0], commandList[i]) == 0)break; //identify and mach command
 
-	ListOfCommands[0] = "exit";
-	ListOfCommands[1] = "bash";
-	ListOfCommands[2] = "execx";
-	ListOfCommands[3] = "clear";
-	ListOfCommands[4] = "ls";
-	ListOfCommands[5] = "bash";
-	ListOfCommands[6] = "cat";	  //--------------
-	ListOfCommands[7] = "writef"; //-------------
-
-	for (i = 0; i < NumberOfCommands; i++)
-	{
-		if (strcmp(parsed[0], ListOfCommands[i]) == 0)
-		{
-			indicator = i + 1;
-			break;
-		}
 	}
+	printf("%d \n",i);
 
-	switch (indicator)
-	{
-	case 1:
-		exit(0);
-	case 2:
-		Echo(parsed[1]);
-		return 1;
-	case 3:
-		Help();
-		return 1;
-	case 4:
-		Clear();
-		return 1;
-	case 5:
-		callWithFileName(parsed);
-		return 1;
-	case 6:
-		callWithFileName(parsed);
-		return 1;
-	case 7:
-		Tekrar(parsed);
-		return 1;
-	case 8:
-		writef(parsed);
-		return 1;
-	default:
-		puts("Invalid Command");
-		break;
+	switch (i){
+		case 0:exit(0);break;
+		case 1:bash();break;
+		case 2:clear();break;
+		case 3:ls();break;
+		case 4:cat(parsed[1]);break;
+		case 5:execx(0);break;
+		case 6:writef(0);break;
+		case 7:help();break;
+		default: printf("invalid argument \n");break;
 	}
-
-	return 0;
 }
 
 
 
 int main(){
-	char inputString[1000], *Args[100];
+	char inputString[1000], *Arguments[100];
 	while (1) {
 		printf("myshell>>");
         if (takeInput(inputString))continue;
-        processString(inputString,Args);
-        printf("%s",Args[0]);
+        processString(inputString,Arguments);
+		executeCommands(Arguments);
 	}
 	return 0;
 }

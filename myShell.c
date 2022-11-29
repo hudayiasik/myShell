@@ -13,31 +13,25 @@ char *readLine()
 	int bufferSize = 1024;
 	char newLine = '\n';
 
-	if (!line)
-	{ // Fail
+	if (!line){ 
 		printf("\n Buffer Could Not Allocated.");
 		exit(1);
 	}
-	while (1)
-	{
+	for (;;){
 		read = getchar();
-		if (read == EOF || read == newLine)
-		{
+		if (read == EOF || read == newLine){
 			line[pos] = nullChar;
 			return line;
 		}
-		else
-		{
+		else{
 			line[pos] = read;
 		}
 		pos++;
 		// If the buffer exceeded
-		if (pos >= bufferSize)
-		{
+		if (pos >= bufferSize){
 			bufferSize += 1024;
 			line = realloc(line, sizeof(char) * bufferSize);
-			if (!line)
-			{ // Fail
+			if (!line){
 				printf("\nBuffer Could Not Allocated");
 				exit(1);
 			}
@@ -45,8 +39,7 @@ char *readLine()
 	}
 }
 // Input Function
-int takeInput(char *str)
-{
+int takeInput(char *str){
 	char *buf;
 	buf = readLine();
 	if (strlen(buf) != 0)
@@ -58,43 +51,14 @@ int takeInput(char *str)
 		return 1;
 }
 // Clear Function
-void Clear()
-{
+void Clear(){
 	printf("\033[H\033[J");
 }
 
 // Echo Function
-void Echo(char *str)
-{
+void Echo(char *str){
 	printf("\nEcho : %s", str);
 }
-// Command Execution by file name
-void callWithFileName(char **parsed)
-{
-	// Child process
-	pid_t pid = fork();
-
-	if (pid == -1)
-	{
-		printf("\nFailed to fork");
-		return;
-	}
-	else if (pid == 0)
-	{
-		if (execvp(parsed[0], parsed) < 0)
-		{
-			printf("\nInvalid command..");
-		}
-		exit(0);
-	}
-	else
-	{
-		// waiting for child to abort
-		wait(NULL);
-		return;
-	}
-}
-
 // Help command
 void Help()
 {
@@ -110,8 +74,7 @@ void Help()
 }
 
 // Function to execute builtin commands
-int commandExecution(char **parsed)
-{
+int executeCommands(char **parsed){
 	int NumberOfCommands = 8;
 	int i;
 	int indicator = 0;
@@ -192,7 +155,35 @@ int main(void)
 		if (takeInput(inputString))
 			continue;
 		processString(inputString, Args);
-		commandExecution(Args);
+		executeCommands(Args);
 	}
 	return 0;
+}
+
+
+// Command Execution by file name
+void callWithFileName(char **parsed)
+{
+	// Child process
+	pid_t pid = fork();
+
+	if (pid == -1)
+	{
+		printf("\nFailed to fork");
+		return;
+	}
+	else if (pid == 0)
+	{
+		if (execvp(parsed[0], parsed) < 0)
+		{
+			printf("\nInvalid command..");
+		}
+		exit(0);
+	}
+	else
+	{
+		// waiting for child to abort
+		wait(NULL);
+		return;
+	}
 }

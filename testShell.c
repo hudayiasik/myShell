@@ -7,6 +7,7 @@
 
 char *readLine(){
 	char *line = (char *)malloc(sizeof(char) * 1024); //  Buffer Allocation 
+	char line[50]={};
 	char read;
 	int pos = 0 ;
 	char nullChar = '\0';
@@ -62,6 +63,65 @@ void processString(char *str, char **parsed){
 	}
 }
 
+int executeCommands(char **parsed){
+	int NumberOfCommands = 8;
+	int i;
+	int indicator = 0;
+	char *ListOfCommands[NumberOfCommands];
+
+	ListOfCommands[0] = "exit";
+	ListOfCommands[1] = "bash";
+	ListOfCommands[2] = "execx";
+	ListOfCommands[3] = "clear";
+	ListOfCommands[4] = "ls";
+	ListOfCommands[5] = "bash";
+	ListOfCommands[6] = "cat";	  //--------------
+	ListOfCommands[7] = "writef"; //-------------
+
+	for (i = 0; i < NumberOfCommands; i++)
+	{
+		if (strcmp(parsed[0], ListOfCommands[i]) == 0)
+		{
+			indicator = i + 1;
+			break;
+		}
+	}
+
+	switch (indicator)
+	{
+	case 1:
+		exit(0);
+	case 2:
+		Echo(parsed[1]);
+		return 1;
+	case 3:
+		Help();
+		return 1;
+	case 4:
+		Clear();
+		return 1;
+	case 5:
+		callWithFileName(parsed);
+		return 1;
+	case 6:
+		callWithFileName(parsed);
+		return 1;
+	case 7:
+		Tekrar(parsed);
+		return 1;
+	case 8:
+		writef(parsed);
+		return 1;
+	default:
+		puts("Invalid Command");
+		break;
+	}
+
+	return 0;
+}
+
+
+
 int main(){
 	char inputString[1000], *Args[100];
 	while (1) {
@@ -69,8 +129,6 @@ int main(){
         if (takeInput(inputString))continue;
         processString(inputString,Args);
         printf("%s",Args[0]);
-
-
 	}
 	return 0;
 }

@@ -17,14 +17,13 @@ int main(int argc, char* argv[]){
 		int num;
         FILE *fptr;
 
-        printf("%s, %s, %s, %s,  ",argv[0],argv[1],argv[2],argv[3]);
-        fptr = fopen("test.txt", "a"); //şimdilik test.txt
+        fptr = fopen("file.txt", "a");
         if(fptr == NULL)
         {
             printf("Error!");   
             exit(1);             
         }
-        fprintf(fptr,"%d",getpid());
+        fprintf(fptr,"%s  %d  %d \n",getSystemTime(),getpid(),getppid());
         fclose(fptr);
 
  		}else {

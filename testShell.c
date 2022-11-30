@@ -97,6 +97,33 @@ void bash(){
 	}
 
 }
+void callProgram(char* name,char* args[]){
+	int f,e;
+  	f = fork(); //Çalışan processin kopyasını oluşturmak için fork işlemini gerçekleştirdim.
+        if(f == 0){  //Child proses ise
+            e = execv(name,args); //Ayrı programı çalıştırmak için execv kullandım.
+            perror("execv failed \n");
+            }		
+}
+void callPrograms(char* parsed[]){
+	pid_t pid = fork();
+	if (pid == -1){
+		printf("\nFailed to fork");
+		return;
+	}
+	else if (pid == 0){
+		if (execvp(parsed[0], parsed) < 0){
+			printf("\nInvalid command..");
+		}
+		exit(0);
+	}
+	else{
+		// waiting for child to abort
+		wait(NULL);
+		return;
+	}
+}
+
 void ls(){
   DIR *d;
   struct dirent *dir;
@@ -131,8 +158,8 @@ int executeCommands(char **parsed){
 		case 2:clear();break;
 		case 3:ls();break;
 		case 4:cat(parsed[1]);break;
-		case 5:execx(0);break;
-		case 6:writef(0);break;
+		case 5:callPrograms(parsed);break;//exec
+		case 6:callPrograms(parsed);break;//writef
 		case 7:help();break;
 		default: printf("invalid argument \n");break;
 	}
